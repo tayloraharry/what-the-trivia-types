@@ -23,7 +23,7 @@ export declare class RoomObject implements IRoomObject {
     getUserById: (userId: number) => IRoomUserObject;
     calculateScore: () => number;
     getCorrectAnswer: () => string;
-    private startQuestionTimer;
+    private allUsersAnswered;
     setNextQuestion(): void;
     submitAnswer(userId: number, answer: string): void;
     expireCurrentQuestion(): void;

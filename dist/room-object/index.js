@@ -14,21 +14,14 @@ class RoomObject {
             return this.users.filter(u => u.id === userId)[0];
         };
         this.calculateScore = () => {
-            const difference = new Date().getTime() - this.currentQuestion.startTime.getTime();
-            return (10 - Math.round(difference / 1000)) * 100;
+            return (this.users.length - this.currentQuestion.usersAnswered.length) * 100;
         };
         this.getCorrectAnswer = () => {
-            return this.currentQuestion.question.answers.filter((a) => a.correct)[0]
+            return this.currentQuestion.question.answers.filter(a => a.correct)[0]
                 .option;
         };
-        this.startQuestionTimer = () => {
-            const { endTime } = this.currentQuestion;
-            const interval = setInterval(() => {
-                if (new Date() >= endTime) {
-                    this.currentQuestion.timeExpired = true;
-                    clearInterval(interval);
-                }
-            }, this.questionTimeLength + 1000);
+        this.allUsersAnswered = () => {
+            return this.users.length === this.currentQuestion.usersAnswered.length;
         };
         this.id = id;
         this.code = "";
@@ -87,7 +80,6 @@ class RoomObject {
             timeExpired: false,
             usersAnswered: [],
         };
-        this.startQuestionTimer();
     }
     submitAnswer(userId, answer) {
         const user = this.getUserById(userId);
@@ -101,11 +93,14 @@ class RoomObject {
         }
         user.currentAnswerPoints = score;
         this.currentQuestion.usersAnswered.push(user.id);
+        if (this.allUsersAnswered()) {
+            this.currentQuestion.timeExpired = true;
+        }
     }
     expireCurrentQuestion() {
         this.currentQuestion.timeExpired = true;
         const { usersAnswered } = this.currentQuestion;
-        if (this.users.length !== usersAnswered.length) {
+        if (this.allUsersAnswered()) {
             this.users.forEach(user => {
                 if (!usersAnswered.includes(user.id)) {
                     usersAnswered.push(user.id);
