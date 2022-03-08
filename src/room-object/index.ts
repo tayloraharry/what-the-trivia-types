@@ -1,8 +1,17 @@
 import { IRoomObject, IRoomUserObject, IQuestionObject } from "../types";
 
+export enum RoomStatus {
+  Waiting = "waiting",
+  Rules = "rules",
+  Question = "question",
+  CurrentScore = "currentScore",
+  FinalScore = "finalScore",
+}
+
 export class RoomObject implements IRoomObject {
   id: string;
   code: string;
+  status: RoomStatus;
   questionTimeLength: number;
   users: IRoomUserObject[];
   started: boolean;
@@ -26,7 +35,8 @@ export class RoomObject implements IRoomObject {
     this.code = "";
     this.questionTimeLength = questionTimeLength || 15000;
     this.users = [];
-    this.started = false;
+    this.status = RoomStatus.Waiting,
+      this.started = false;
     this.questions = questions;
     this.currentQuestion = {
       number: 0,
@@ -47,14 +57,13 @@ export class RoomObject implements IRoomObject {
   }
 
   setRoomCode(): void {
-    this.code = this.id
-      .replace(/[\W_]+/g, ' ')
-      .substring(0, 4)
-      .toUpperCase();
+    let code = this.id.replace(/[\W_]+/g, ' ');
+    this.code = code.substring(0, 4).toUpperCase();
   }
 
   startGame(): void {
     this.started = true;
+    this.status = RoomStatus.Rules;
   }
 
   joinGame(name: string): boolean {
@@ -100,15 +109,21 @@ export class RoomObject implements IRoomObject {
 
   setNextQuestion(): void {
     const questionNumber = this.currentQuestion.number + 1;
-    const questionTime = new Date();
-    this.currentQuestion = {
-      number: questionNumber,
-      question: this.questions[questionNumber - 1],
-      startTime: questionTime,
-      endTime: new Date(questionTime.getTime() + this.questionTimeLength),
-      timeExpired: false,
-      usersAnswered: [],
-    };
+    if (questionNumber - 1 > this.questions.length) {
+      this.status = RoomStatus.FinalScore;
+    } else {
+      this.status = RoomStatus.Question;
+      const questionTime = new Date();
+      this.currentQuestion = {
+        number: questionNumber,
+        question: this.questions[questionNumber - 1],
+        startTime: questionTime,
+        endTime: new Date(questionTime.getTime() + this.questionTimeLength),
+        timeExpired: false,
+        usersAnswered: [],
+      };
+    }
+
   }
 
   submitAnswer(userId: number, answer: string): void {
@@ -120,15 +135,17 @@ export class RoomObject implements IRoomObject {
     } else {
       user.totalPoints -= score;
     }
-    
+
     user.currentAnswerPoints = score;
     this.currentQuestion.usersAnswered.push(user.id);
     if (this.allUsersAnswered()) {
       this.currentQuestion.timeExpired = true;
+      this.status = RoomStatus.CurrentScore;
     }
   }
 
   expireCurrentQuestion(): void {
+    this.status = RoomStatus.CurrentScore;
     this.currentQuestion.timeExpired = true;
     const { usersAnswered } = this.currentQuestion
 

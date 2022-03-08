@@ -9,7 +9,7 @@ export {
 } from "./types";
 
 //classes
-export { RoomObject } from "./room-object";
+export { RoomObject, RoomStatus } from "./room-object";
 
 //utils
 export { getEmptyRoom } from "./utils/room";
