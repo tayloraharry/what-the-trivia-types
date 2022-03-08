@@ -1,3 +1,4 @@
+import { RoomStatus } from "../../room-object";
 import { IRoomObject } from "../../types";
 
 export const getEmptyRoom = (): IRoomObject => {
@@ -7,6 +8,7 @@ export const getEmptyRoom = (): IRoomObject => {
     questionTimeLength: 15000,
     users: [],
     started: false,
+    status: RoomStatus.Waiting,
     questions: [],
     currentQuestion: {
       number: 0,

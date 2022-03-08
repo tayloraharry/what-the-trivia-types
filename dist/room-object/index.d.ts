@@ -1,7 +1,15 @@
 import { IRoomObject, IRoomUserObject, IQuestionObject } from "../types";
+export declare enum RoomStatus {
+    Waiting = "waiting",
+    Rules = "rules",
+    Question = "question",
+    CurrentScore = "currentScore",
+    FinalScore = "finalScore"
+}
 export declare class RoomObject implements IRoomObject {
     id: string;
     code: string;
+    status: RoomStatus;
     questionTimeLength: number;
     users: IRoomUserObject[];
     started: boolean;

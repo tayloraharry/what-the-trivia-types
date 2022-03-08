@@ -1,6 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.RoomObject = void 0;
+exports.RoomObject = exports.RoomStatus = void 0;
+var RoomStatus;
+(function (RoomStatus) {
+    RoomStatus["Waiting"] = "waiting";
+    RoomStatus["Rules"] = "rules";
+    RoomStatus["Question"] = "question";
+    RoomStatus["CurrentScore"] = "currentScore";
+    RoomStatus["FinalScore"] = "finalScore";
+})(RoomStatus = exports.RoomStatus || (exports.RoomStatus = {}));
 class RoomObject {
     constructor(id, questions, questionTimeLength) {
         this.getNewestUser = () => {
@@ -27,7 +35,8 @@ class RoomObject {
         this.code = "";
         this.questionTimeLength = questionTimeLength || 15000;
         this.users = [];
-        this.started = false;
+        this.status = RoomStatus.Waiting,
+            this.started = false;
         this.questions = questions;
         this.currentQuestion = {
             number: 0,
@@ -47,13 +56,12 @@ class RoomObject {
         this.setRoomCode();
     }
     setRoomCode() {
-        this.code = this.id
-            .replace(/[\W_]+/g, ' ')
-            .substring(0, 4)
-            .toUpperCase();
+        let code = this.id.replace(/[\W_]+/g, ' ');
+        this.code = code.substring(0, 4).toUpperCase();
     }
     startGame() {
         this.started = true;
+        this.status = RoomStatus.Rules;
     }
     joinGame(name) {
         const userExists = this.users.filter(u => u.name === name).length > 0;
@@ -71,15 +79,21 @@ class RoomObject {
     }
     setNextQuestion() {
         const questionNumber = this.currentQuestion.number + 1;
-        const questionTime = new Date();
-        this.currentQuestion = {
-            number: questionNumber,
-            question: this.questions[questionNumber - 1],
-            startTime: questionTime,
-            endTime: new Date(questionTime.getTime() + this.questionTimeLength),
-            timeExpired: false,
-            usersAnswered: [],
-        };
+        if (questionNumber - 1 > this.questions.length) {
+            this.status = RoomStatus.FinalScore;
+        }
+        else {
+            this.status = RoomStatus.Question;
+            const questionTime = new Date();
+            this.currentQuestion = {
+                number: questionNumber,
+                question: this.questions[questionNumber - 1],
+                startTime: questionTime,
+                endTime: new Date(questionTime.getTime() + this.questionTimeLength),
+                timeExpired: false,
+                usersAnswered: [],
+            };
+        }
     }
     submitAnswer(userId, answer) {
         const user = this.getUserById(userId);
@@ -95,9 +109,11 @@ class RoomObject {
         this.currentQuestion.usersAnswered.push(user.id);
         if (this.allUsersAnswered()) {
             this.currentQuestion.timeExpired = true;
+            this.status = RoomStatus.CurrentScore;
         }
     }
     expireCurrentQuestion() {
+        this.status = RoomStatus.CurrentScore;
         this.currentQuestion.timeExpired = true;
         const { usersAnswered } = this.currentQuestion;
         if (!this.allUsersAnswered()) {
