@@ -11,7 +11,7 @@ export class RoomObject implements IRoomObject {
     number: number;
     timeExpired: boolean;
     question: IQuestionObject;
-    usersAnswered: IRoomUserObject[];
+    usersAnswered: number[];
     startTime: Date | null;
     endTime: Date | null;
   };
@@ -58,7 +58,7 @@ export class RoomObject implements IRoomObject {
   }
 
   joinGame(name: string): boolean {
-    const userExists = this.users.filter((u) => u.name === name).length > 0;
+    const userExists = this.users.filter(u => u.name === name).length > 0;
     if (userExists) {
       return false;
     }
@@ -82,7 +82,7 @@ export class RoomObject implements IRoomObject {
   };
 
   getUserById = (userId: number): IRoomUserObject => {
-    return this.users.filter((u) => u.id === userId)[0];
+    return this.users.filter(u => u.id === userId)[0];
   };
 
   calculateScore = (): number => {
@@ -130,6 +130,21 @@ export class RoomObject implements IRoomObject {
       user.totalPoints -= score;
     }
     user.currentAnswerPoints = score;
-    this.currentQuestion.usersAnswered.push(user);
+    this.currentQuestion.usersAnswered.push(user.id);
+  }
+
+  expireCurrentQuestion(): void {
+    this.currentQuestion.timeExpired = true;
+    const { usersAnswered } = this.currentQuestion
+
+    if (this.users.length !== usersAnswered.length) {
+      this.users.forEach(user => {
+        if (!usersAnswered.includes(user.id)) {
+          usersAnswered.push(user.id);
+          user.currentAnswerPoints = -1000;
+          user.totalPoints -= 1000;
+        }
+      })
+    }
   }
 }

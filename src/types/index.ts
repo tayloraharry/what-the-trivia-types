@@ -31,7 +31,7 @@ export interface IRoomObject {
     number: number;
     timeExpired: boolean;
     question: IQuestionObject;
-    usersAnswered: IRoomUserObject[];
+    usersAnswered: number[];
     startTime: Date | null;
     endTime: Date | null;
   };
