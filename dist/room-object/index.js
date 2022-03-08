@@ -100,7 +100,7 @@ class RoomObject {
     expireCurrentQuestion() {
         this.currentQuestion.timeExpired = true;
         const { usersAnswered } = this.currentQuestion;
-        if (this.allUsersAnswered()) {
+        if (!this.allUsersAnswered()) {
             this.users.forEach(user => {
                 if (!usersAnswered.includes(user.id)) {
                     usersAnswered.push(user.id);

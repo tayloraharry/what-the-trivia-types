@@ -120,6 +120,7 @@ export class RoomObject implements IRoomObject {
     } else {
       user.totalPoints -= score;
     }
+    
     user.currentAnswerPoints = score;
     this.currentQuestion.usersAnswered.push(user.id);
     if (this.allUsersAnswered()) {
