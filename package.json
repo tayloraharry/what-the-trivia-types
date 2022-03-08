@@ -1,6 +1,6 @@
 {
   "name": "what-the-trivia-types",
-  "version": "1.0.21",
+  "version": "1.0.22",
   "description": "What the Trivia types and related entities",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
