@@ -9,5 +9,8 @@
   ],
   "scripts": {
     "deploy": "npm version patch && tsc && npm publish"
+  },
+  "dependencies": {
+    "typescript": "^4.6.2"
   }
 }
