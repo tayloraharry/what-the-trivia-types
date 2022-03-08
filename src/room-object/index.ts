@@ -86,25 +86,17 @@ export class RoomObject implements IRoomObject {
   };
 
   calculateScore = (): number => {
-    const difference =
-      new Date().getTime() - this.currentQuestion.startTime!.getTime();
-    return (10 - Math.round(difference / 1000)) * 100;
+    return (this.users.length - this.currentQuestion.usersAnswered.length) * 100;
   };
 
   getCorrectAnswer = (): string => {
-    return this.currentQuestion.question.answers.filter((a) => a.correct)[0]
+    return this.currentQuestion.question.answers.filter(a => a.correct)[0]
       .option;
   };
 
-  private startQuestionTimer = (): void => {
-    const { endTime } = this.currentQuestion;
-    const interval = setInterval(() => {
-      if (new Date() >= endTime!) {
-        this.currentQuestion.timeExpired = true;
-        clearInterval(interval);
-      }
-    }, this.questionTimeLength + 1000);
-  };
+  private allUsersAnswered = (): boolean => {
+    return this.users.length === this.currentQuestion.usersAnswered.length;
+  }
 
   setNextQuestion(): void {
     const questionNumber = this.currentQuestion.number + 1;
@@ -117,7 +109,6 @@ export class RoomObject implements IRoomObject {
       timeExpired: false,
       usersAnswered: [],
     };
-    this.startQuestionTimer();
   }
 
   submitAnswer(userId: number, answer: string): void {
@@ -131,13 +122,16 @@ export class RoomObject implements IRoomObject {
     }
     user.currentAnswerPoints = score;
     this.currentQuestion.usersAnswered.push(user.id);
+    if (this.allUsersAnswered()) {
+      this.currentQuestion.timeExpired = true;
+    }
   }
 
   expireCurrentQuestion(): void {
     this.currentQuestion.timeExpired = true;
     const { usersAnswered } = this.currentQuestion
 
-    if (this.users.length !== usersAnswered.length) {
+    if (this.allUsersAnswered()) {
       this.users.forEach(user => {
         if (!usersAnswered.includes(user.id)) {
           usersAnswered.push(user.id);

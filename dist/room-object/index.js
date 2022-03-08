@@ -11,7 +11,7 @@ class RoomObject {
             return null;
         };
         this.getUserById = (userId) => {
-            return this.users.filter((u) => u.id === userId)[0];
+            return this.users.filter(u => u.id === userId)[0];
         };
         this.calculateScore = () => {
             const difference = new Date().getTime() - this.currentQuestion.startTime.getTime();
@@ -63,7 +63,7 @@ class RoomObject {
         this.started = true;
     }
     joinGame(name) {
-        const userExists = this.users.filter((u) => u.name === name).length > 0;
+        const userExists = this.users.filter(u => u.name === name).length > 0;
         if (userExists) {
             return false;
         }
@@ -100,7 +100,20 @@ class RoomObject {
             user.totalPoints -= score;
         }
         user.currentAnswerPoints = score;
-        this.currentQuestion.usersAnswered.push(user);
+        this.currentQuestion.usersAnswered.push(user.id);
+    }
+    expireCurrentQuestion() {
+        this.currentQuestion.timeExpired = true;
+        const { usersAnswered } = this.currentQuestion;
+        if (this.users.length !== usersAnswered.length) {
+            this.users.forEach(user => {
+                if (!usersAnswered.includes(user.id)) {
+                    usersAnswered.push(user.id);
+                    user.currentAnswerPoints = -1000;
+                    user.totalPoints -= 1000;
+                }
+            });
+        }
     }
 }
 exports.RoomObject = RoomObject;

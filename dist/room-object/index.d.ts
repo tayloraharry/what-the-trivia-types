@@ -10,7 +10,7 @@ export declare class RoomObject implements IRoomObject {
         number: number;
         timeExpired: boolean;
         question: IQuestionObject;
-        usersAnswered: IRoomUserObject[];
+        usersAnswered: number[];
         startTime: Date | null;
         endTime: Date | null;
     };
@@ -26,4 +26,5 @@ export declare class RoomObject implements IRoomObject {
     private startQuestionTimer;
     setNextQuestion(): void;
     submitAnswer(userId: number, answer: string): void;
+    expireCurrentQuestion(): void;
 }
