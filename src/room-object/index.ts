@@ -109,7 +109,7 @@ export class RoomObject implements IRoomObject {
 
   setNextQuestion(): void {
     const questionNumber = this.currentQuestion.number + 1;
-    if (questionNumber - 1 > this.questions.length) {
+    if (typeof this.questions[questionNumber - 1] === 'undefined') {
       this.status = RoomStatus.FinalScore;
     } else {
       this.status = RoomStatus.Question;

@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getEmptyRoom = void 0;
+const room_object_1 = require("../../room-object");
 const getEmptyRoom = () => {
     return {
         id: "",
@@ -8,6 +9,7 @@ const getEmptyRoom = () => {
         questionTimeLength: 15000,
         users: [],
         started: false,
+        status: room_object_1.RoomStatus.Waiting,
         questions: [],
         currentQuestion: {
             number: 0,

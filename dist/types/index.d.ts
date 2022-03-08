@@ -1,3 +1,4 @@
+import { RoomStatus } from "../room-object";
 export interface IAnswerObject {
     option: string;
     text: string;
@@ -22,6 +23,7 @@ export interface IRoomObject {
     code: string;
     questionTimeLength: number;
     users: IRoomUserObject[];
+    status: RoomStatus;
     started: boolean;
     questions: IQuestionObject[];
     currentQuestion: {
