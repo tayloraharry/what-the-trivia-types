@@ -55,8 +55,7 @@ class RoomObject {
     }
     setRoomCode() {
         this.code = this.id
-            .replace("-", "")
-            .replace("_", "")
+            .replace(/[\W_]+/g, ' ')
             .substring(0, 4)
             .toUpperCase();
     }
